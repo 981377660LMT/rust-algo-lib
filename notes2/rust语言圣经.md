@@ -1,0 +1,122 @@
+[rust 语言圣经](https://course.rs/about-book.html)
+
+1. 包管理工具最重要的意义就是任何用户拿到你的代码，都能运行起来，而不会因为各种包版本依赖焦头烂额。
+2. 很多语言中，你并不需要深入了解栈与堆。 但对于 Rust 这样的系统编程语言，值是位于栈上还是堆上非常重要, 因为这会影响程序的行为和性能。
+
+- 栈中的所有数据都**必须占用已知且固定大小的内存空间**，假设数据大小是未知的，那么在取出数据时，你将无法取到你想要的数据
+- 与栈不同，对于**大小未知或者可能变化的数据**，我们需要将它存储在堆上。
+  当向堆上放入数据时，需要请求一定大小的内存空间。操作系统在堆的某处找到一块足够大的空位，把它标记为已使用，并返回一个表示该位置地址的**指针**, 该过程被称为在**堆上分配内存，有时简称为 “分配”(allocating)**。
+  接着，该指针会被推入**栈**中，因为指针的大小是已知且固定的，在后续使用过程中，你将通过栈中的**指针**，来获取数据在堆上的实际内存位置，进而访问该数据。
+  想象一下去餐馆就座吃饭: 进入餐馆，告知服务员有几个人，然后服务员找到一个够大的空桌子（堆上分配的内存空间）并领你们过去。如果有人来迟了，他们也可以通过桌号（栈上的指针）来找到你们坐在哪。
+  在堆上分配内存则需要更多的工作，这是因为操作系统必须**首先找到一块足够存放数据的内存空间**，接着做一些记录为下一次分配做准备，如果**当前进程分配的内存页不足时(缺页中断)，还需要进行系统调用来申请更多内存**。 因此，处理器在栈上分配数据会比在堆上分配数据更加高效。
+
+  https://github.com/youngyangyang04/TechCPP/blob/master/problems/%E4%BB%80%E4%B9%88%E6%98%AF%E7%BC%BA%E9%A1%B5%E4%B8%AD%E6%96%AD.md
+  缺页中断是计算机操作系统中的一个重要概念，发生在程序访问虚拟内存时，需要加载的页面不在主存中，需要从辅存（如硬盘）中读取的情况下。当程序试图访问一个已经被映射到虚拟地址空间但尚未载入物理内存的页面时，就会引发缺页中断。
+
+  具体来说，当程序访问一个虚拟地址时，操作系统会首先检查该地址对应的页面是否已经在主存中。如果页面在主存中，那么程序可以直接访问；如果页面不在主存中，就会触发缺页中断。此时，操作系统会进行以下步骤：
+
+  中断处理：CPU 接收到缺页中断信号后，暂停当前正在执行的程序，将控制权交给操作系统内核。
+  处理程序：操作系统会根据页面表或其他映射信息确定页面所在的位置（通常是磁盘），并将页面加载到主存中的空闲页面框中。
+  更新页表：操作系统更新页表中有关该页面的信息，包括物理地址等。
+  恢复程序：一旦页面加载到内存中，操作系统会重新启动之前暂停的程序，使其继续执行。
+
+3. 变量遮蔽(shadowing)
+   变量遮蔽(shadowing)是指在同一作用域中，你可以定义一个与之前变量同名的新变量，这样新变量会遮蔽之前的变量。
+   变量遮蔽的用处在于，如果你在某个作用域内无需再使用之前的变量（在被遮蔽后，无法再访问到之前的同名变量），就可以重复的使用变量名字，**而不用绞尽脑汁去想更多的名字**。
+   例如，假设有一个程序要统计一个空格字符串的空格数量：
+
+   ```RUST
+    // 字符串类型
+    let spaces = " ";
+    // usize 数值类型
+    let spaces = spaces.len();
+
+    // 变量遮蔽可以帮我们节省些脑细胞，不用去想如 str_spaces 和 num_spaces 此类的变量名
+   ```
+
+4. 对于 Rust 语言而言，这种**基于语句（statement）和表达式（expression）的方式**是非常重要的，你需要能明确的区分这两个概念, 但是对于很多其它语言而言，这两个往往无需区分。**基于表达式是函数式语言的重要特征，表达式总要返回值。**
+   表达式如果不返回任何值，会隐式地返回一个 () 。
+
+---
+
+- 命名规范
+  https://course.rs/practice/naming.html
+
+  - 变量命名
+    对于 type-level 的构造 Rust 倾向于使用驼峰命名法，而对于 value-level 的构造使用蛇形命名法
+    对于驼峰命名法，复合词的缩略形式我们认为是一个单独的词语，所以只对首字母进行大写：**使用 Uuid 而不是 UUID**，Usize 而不是 USize，Stdin 而不是 StdIn。
+    对于蛇形命名法，缩略词用全小写：**is_xid_start。**
+    对于蛇形命名法（包括全大写的 SCREAMING_SNAKE_CASE），除了最后一部分，其它部分的词语都**不能由单个字母组成： btree_map 而不是 b_tree_map，PI_2 而不是 PI2.**
+
+  - 特征命名
+    特征的名称应该使用动词，而不是形容词或者名词，例如 Print 和 Draw 明显好于 Printable 和 Drawable。
+  - 类型转换要遵守 `as_，to_，into_` 命名惯例(C-CONV)
+    类型转换应该通过方法调用的方式实现，其中的前缀规则如下：
+
+    - `as_`：表示类型转换，无性能开销，borrowed -> borrowed.
+    - `to_`：表示类型转换，性能开销大，返回一个新的值。
+    - `into_`：表示类型转换，转换本身是零消耗的，ownership 转移，返回一个新的值。
+
+    例子：
+
+    - str::as_bytes() 把 str 变成 UTF-8 字节数组，性能开销是 0。输入是一个借用的 &str，输出也是一个借用的 &str
+    - Path::to_str 会执行一次昂贵的 UTF-8 字节数组检查，输入和输出都是借用的。对于这种情况，如果把方法命名为 as_str 是不正确的，因为这个方法的开销还挺大
+    - str::to_lowercase() 在调用过程中会遍历字符串的字符，且可能会分配新的内存对象。输入是一个借用的 str，输出是一个有独立所有权的 String
+    - String::into_bytes() 返回 String 底层的 Vec<u8> 数组，转换本身是零消耗的。该方法获取 String 的所有权，然后返回一个新的有独立所有权的 Vec<u8>
+    - 当一个单独的值被某个类型所包装时，访问该类型的内部值应通过 `into_inner()`方法来访问
+
+    `如果 mut 限定符在返回类型中出现，那么在命名上也应该体现出来。`
+    例如，Vec::as_mut_slice 就说明它返回了一个 mut 切片，在这种情况下 as_mut_slice 比 as_slice_mut 更适合
+
+    ```rust
+    // 返回类型是一个 `mut` 切片
+    fn as_mut_slice(&mut self) -> &mut [T];
+    ```
+
+  - 读访问器(Getter)的名称遵循 Rust 的命名规范(C-GETTER)
+    除了少数例外，在 Rust 代码中 **get 前缀不用于 Getter**。
+
+    ```rust
+    pub struct S {
+        first: First,
+        second: Second,
+    }
+
+    impl S {
+        // 而不是 get_first
+        pub fn first(&self) -> &First {
+            &self.first
+        }
+
+        // 而不是 get_first_mut，get_mut_first，or mut_first
+        pub fn first_mut(&mut self) -> &mut First {
+            &mut self.first
+        }
+    }
+    ```
+
+    当有且仅有一个值能被 Getter 所获取时，才使用 get 前缀。
+    例如，Cell::get 能直接访问到 Cell 中的内容。
+
+  - 一个集合上的方法，如果返回迭代器，需遵循命名规则：iter，iter_mut，into_iter (C-ITER)
+
+  ```RUST
+  fn iter(&self) -> Iter             // Iter implements Iterator<Item = &U>
+  fn iter_mut(&mut self) -> IterMut  // IterMut implements Iterator<Item = &mut U>
+  fn into_iter(self) -> IntoIter     // IntoIter implements Iterator<Item = U>
+  ```
+
+  - Cargo Feature 的名称不应该包含占位词(C-FEATURE)
+    不要在 Cargo feature 中包含无法传达任何意义的词，例如 use-abc 或 with-abc，直接命名为 abc 即可。
+  - 命名要使用**一致性的词序**(C-WORD-ORDER)
+    这是一些标准库中的错误类型:
+
+    JoinPathsError
+    ParseBoolError
+    ParseCharError
+    ParseFloatError
+    ParseIntError
+    RecvTimeoutError
+    StripPrefixError
+    它们都使用了 **谓语-宾语-错误** 的词序，如果我们想要表达一个网络地址无法分析的错误，由于词序一致性的原则，命名应该如下 ParseAddrError，而不是 AddrParseError。
+    词序和个人习惯有很大关系，想要注意的是，你可以选择合适的词序，**但是要在包的范畴内保持一致性，就如标准库中的包一样**。
