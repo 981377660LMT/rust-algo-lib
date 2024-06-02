@@ -95,12 +95,18 @@ use self::{canvas::CanvasFactory, dom::DomFactory, ui::IFactoryDynamic};
 
 // Client code with dynamic dispatch.
 fn main() {
-    let use_dom = false;
-
     // Allocate a factory object in runtime depending on unpredictable input.
-    let factory: &dyn IFactoryDynamic = if use_dom { &DomFactory } else { &CanvasFactory };
 
+    let factory = init();
     render(factory);
+
+    fn init() -> &'static dyn IFactoryDynamic {
+        if cfg!(use_dome) {
+            &DomFactory
+        } else {
+            &CanvasFactory
+        }
+    }
 
     // Renders a GUI by the given factory.
     // The code demonstrates that it doesn't depend on a concrete factory implementation.
