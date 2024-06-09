@@ -1,4 +1,3 @@
-mod a;
 mod atcoder;
 mod yosupo;
 

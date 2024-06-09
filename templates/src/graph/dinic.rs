@@ -1,7 +1,8 @@
 //! 最大流 (Dinic)
 
-pub use crate::graph::flow::*;
 use std::{cmp::min, collections::VecDeque};
+
+use super::flow::MaxFlow;
 
 #[derive(Clone, Debug)]
 struct Edge {

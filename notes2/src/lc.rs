@@ -1,91 +1,45 @@
-// def rob(nums: List[int]) -> int:
-//     if not nums:
-//         return 0
-
-//     dp0, dp1 = 0, nums[0]
-//     for i in range(1, len(nums)):
-//         dp0, dp1 = max(dp0, dp1), dp0 + nums[i]
-//     return max(dp0, dp1)
-
-// 给你一个整数数组 nums 和一个二维数组 queries，其中 queries[i] = [posi, xi]。
-
-// 对于每个查询 i，首先将 nums[posi] 设置为 xi，然后计算查询 i 的答案，该答案为 nums 中 不包含相邻元素 的子序列的 最大 和。
-
-// 返回所有查询的答案之和。
-
-// 由于最终答案可能非常大，返回其对 109 + 7 取余 的结果。
-
-// 子序列 是指从另一个数组中删除一些或不删除元素而不改变剩余元素顺序得到的数组。
 struct Solution {}
 
-// impl Solution {
-//     pub fn maximum_sum_subsequence(nums: Vec<i32>, queries: Vec<Vec<i32>>) -> i32 {
-//         unsafe { Solution::maximum_sum_subsequence_unsafe(nums, queries) }
-//     }
-
-//     #[target_feature(enable = "avx2")]
-//     pub unsafe fn maximum_sum_subsequence_unsafe(nums: Vec<i32>, queries: Vec<Vec<i32>>) -> i32 {
-//         let mut res: i64 = 0;
-//         let mut nums64 = nums.into_iter().map(|x| x as i64).collect::<Vec<i64>>();
-
-//         let mut pre_res: Option<i64> = None;
-//         for query in queries {
-//             let pos = query[0] as usize;
-//             let x = query[1] as i64;
-//             if nums64[pos] <= 0 && x <= 0 && pre_res.is_some() {
-//                 res += pre_res.unwrap();
-//                 nums64[pos] = x;
-//                 continue;
-//             }
-
-//             nums64[pos] = x;
-//             let mut dp0: i64 = 0;
-//             let mut dp1: i64 = nums64[0];
-//             let mut tmp: i64 = 0;
-//             for v in nums64.iter().skip(1) {
-//                 tmp = dp0.max(dp1);
-//                 dp1 = dp0 + v;
-//                 dp0 = tmp;
-//             }
-
-//             let cur_res = dp0.max(dp1);
-//             pre_res = Some(cur_res);
-//             res += cur_res;
-//         }
-
-//         (res % 1_000_000_007) as i32
-//     }
-// }
-
+// 100320. 执行操作可获得的最大总奖励 II
+// https://leetcode.cn/contest/weekly-contest-401/problems/maximum-total-reward-using-operations-ii/
+// !非常关键的一点是：获取vec下标元素用get_unchecked_mut，这样可以避免越界检查，提高性能
 impl Solution {
-    pub fn maximum_sum_subsequence(nums: Vec<i32>, queries: Vec<Vec<i32>>) -> i32 {
-        unsafe { Solution::maximum_sum_subsequence_unsafe(nums, queries) }
+    pub fn max_total_reward(mut reward_values: Vec<i32>) -> i32 {
+        unsafe { Self::max_total_reward_unsafe(reward_values) }
     }
 
     #[target_feature(enable = "avx2")]
-    pub unsafe fn maximum_sum_subsequence_unsafe(nums: Vec<i32>, queries: Vec<Vec<i32>>) -> i32 {
-        let mut res: i64 = 0;
-        let mut nums64 = nums.into_iter().map(|x| x as i64).collect::<Vec<i64>>();
+    pub unsafe fn max_total_reward_unsafe(mut reward_values: Vec<i32>) -> i32 {
+        reward_values.sort_unstable();
+        reward_values.dedup();
+        let max = reward_values[reward_values.len() - 1];
+        let mut dp = vec![false; 2 * max as usize + 1];
+        dp[0] = true;
 
-        for query in queries {
-            let pos = query[0] as usize;
-            let x = query[1] as i64;
-
-            nums64[pos] = x;
-            let mut dp0: i64 = 0;
-            let mut dp1: i64 = nums64[0];
-            let mut tmp: i64 = 0;
-            for v in nums64.iter().skip(1) {
-                tmp = dp0.max(dp1);
-                dp1 = dp0 + v;
-                dp0 = tmp;
+        for v in reward_values.into_iter() {
+            for x in (v..(v << 1)).rev() {
+                unsafe {
+                    *(dp.get_unchecked_mut(x as usize)) |= *dp.get_unchecked((x - v) as usize);
+                }
             }
-
-            res += dp0.max(dp1);
         }
 
-        (res % 1_000_000_007) as i32
+        dp.iter().enumerate().rfind(|(_, &x)| x).unwrap().0 as i32
     }
+}
 
-    fn bar(args: &[String]) {}
+// 2935. 找出强数对的最大异或值 II
+// https://leetcode.cn/problems/maximum-strong-pair-xor-ii/description/
+impl Solution {
+    pub fn maximum_strong_pair_xor(mut nums: Vec<i32>) -> i32 {
+        let mut res = 0;
+        nums.sort_unstable();
+        for (i, v1) in nums.iter().enumerate() {
+            for v2 in nums.iter().take(i).skip_while(|&v| 2 * v < *v1) {
+                res = res.max(v1 ^ v2);
+            }
+        }
+
+        res
+    }
 }

@@ -1,10 +1,11 @@
 use std::collections::HashMap;
+use std::io::Write;
 
 use templates::misc::io::run_with_io;
 
 #[allow(unused)]
 fn main() {
-    run_with_io(|input, ouput| {
+    run_with_io(|input, output| {
         let q: usize = input.next();
         let mut map = HashMap::new();
         for _ in 0..q {
@@ -16,7 +17,7 @@ fn main() {
             } else {
                 let k: i64 = input.next();
                 let res = map.get(&k).unwrap_or(&0);
-                writeln!(ouput, "{}", res).ok();
+                writeln!(output, "{}", res).ok();
             }
         }
     })

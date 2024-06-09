@@ -254,6 +254,105 @@ fn main() {
 }
 ```
 
+# Macro 宏编程
+
+1. 在 Rust 中宏分为两大类：
+
+- `声明式宏`( declarative macros ) macro_rules!
+- 三种`过程宏`( procedural macros ):
+
+  - #[derive]，在之前多次见到的派生宏，可以为目标结构体或枚举派生指定的代码，例如 Debug 特征
+  - 类属性宏(Attribute-like macro)，用于为目标添加自定义的属性
+  - 类函数宏(Function-like macro)，看上去就像是函数调用
+
+2. 宏和函数的区别
+
+- 元编程
+- 可变参数
+
+# async/await 异步编程(难,TODO)
+
+1. async 是 Rust 选择的异步编程模型
+   async vs 其它`并发模型`
+
+   - os 线程
+   - 事件驱动
+   - 协程
+   - actor 模型
+   - async/await
+
+   Rust 经过权衡取舍后，最终选择了同时提供`多线程(CPU 密集型任务)`编程和 `async(IO 密集型任务)` 编程`:
+
+   前者通过标准库实现，当你无需那么高的并发时，例如需要并行计算时，可以选择它，优点是线程内的代码执行效率更高、实现更直观更简单；
+   后者通过语言特性 + 标准库 + 三方库的方式实现，在你需要高并发、异步 I/O 时，选择它就对了
+
+2. 选择
+
+- 有大量 IO 任务需要并发运行时，选 `async` 模型
+- 有部分 IO 任务需要并发运行时，选`多线程`，如果想要降低线程创建和销毁的开销，可以使用线程池
+- 有大量 CPU 密集任务需要并行运行时，例如并行计算，选`多线程`模型，且让线程数等于或者稍大于 CPU 核心数
+- 无所谓时，统一选`多线程`
+
+3. async 和多线程的性能对比
+   |操作 |async| 线程|
+   |---|---|---|
+   |创建| 0.3 微秒| 17 微秒|
+   |线程切换| 0.2 微秒| 1.7 微秒|
+
+# cargo 使用
+
+Cargo 为了实现目标，做了四件事：
+
+- 引入两个元数据文件，包含项目的方方面面信息: Cargo.toml 和 Cargo.lock
+- 获取和构建项目的依赖，例如 Cargo.toml 中的依赖包版本描述，以及从 crates.io 下载包
+- 调用 rustc (或其它编译器) 并使用的正确的参数来构建项目，例如 cargo build
+- 引入一些惯例，让项目的使用更加简单
+
+1. 标准 package 结构
+
+```
+一个典型的 Package 目录结构如下：
+
+.
+├── Cargo.lock
+├── Cargo.toml
+├── src/
+│   ├── lib.rs
+│   ├── main.rs
+│   └── bin/
+│       ├── named-executable.rs
+│       ├── another-executable.rs
+│       └── multi-file-executable/
+│           ├── main.rs
+│           └── some_module.rs
+├── benches/
+│   ├── large-input.rs
+│   └── multi-file-bench/
+│       ├── main.rs
+│       └── bench_module.rs
+├── examples/
+│   ├── simple.rs
+│   └── multi-file-example/
+│       ├── main.rs
+│       └── ex_module.rs
+└── tests/
+    ├── some-integration-tests.rs
+    └── multi-file-test/
+        ├── main.rs
+        └── test_module.rs
+```
+
+2. 是否上传本地的 Cargo.lock
+
+- 从实践角度出发，如果你构建的是三方`库`类型的服务，请把 Cargo.lock 加入到 .gitignore 中。
+- 若构建的是一个面向用户终端的产品，例如可以像`命令行工具、应用程序`一样执行，那就把 Cargo.lock 上传到源代码目录中。
+
+3. 指定依赖项
+
+4. 条件编译 Features
+   Conditional compilation
+   Feature 可以通过 Cargo.toml 中的 [features] 部分来定义：其中每个 feature 通过列表的方式指定了它所能启用的其他 feature 或可选依赖。
+
 ---
 
 - 命名规范

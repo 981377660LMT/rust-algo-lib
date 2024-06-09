@@ -1,7 +1,7 @@
 //! Project Selection Problem
 //! 燃やす埋める問題
 
-use crate::graph::flow::*;
+use super::flow::MaxFlow;
 
 /// Project Selection Problem
 ///
