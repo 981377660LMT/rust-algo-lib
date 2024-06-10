@@ -1,6 +1,6 @@
 // ---------- begin scannner ----------
 #[allow(dead_code)]
-mod scanner {
+pub mod scanner {
     use std::str::FromStr;
     pub struct Scanner<'a> {
         it: std::str::SplitWhitespace<'a>,
@@ -11,6 +11,7 @@ mod scanner {
                 it: s.split_whitespace(),
             }
         }
+
         pub fn next<T: FromStr>(&mut self) -> T {
             self.it.next().unwrap().parse::<T>().ok().unwrap()
         }

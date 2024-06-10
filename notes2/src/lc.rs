@@ -1,7 +1,7 @@
 struct Solution {}
 
-// 100320. 执行操作可获得的最大总奖励 II
-// https://leetcode.cn/contest/weekly-contest-401/problems/maximum-total-reward-using-operations-ii/
+// 3181. 执行操作可获得的最大总奖励 II
+// https://leetcode.cn/problems/maximum-total-reward-using-operations-ii/description/
 // !非常关键的一点是：获取vec下标元素用get_unchecked_mut，这样可以避免越界检查，提高性能
 impl Solution {
     pub fn max_total_reward(mut reward_values: Vec<i32>) -> i32 {
