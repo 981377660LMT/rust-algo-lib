@@ -242,11 +242,8 @@ mod tests {
 
     #[test]
     fn test() {
-        let mut set = FastSet::new_with_filled(10, true);
-        set.insert(1);
-        set.insert(3);
-        println!("{}", set);
-
+        let set = FastSet::new_with_filled(10, true);
+        assert_eq!(set.iter().collect::<Vec<_>>(), (0..10).collect::<Vec<_>>());
         let iter = set.iter();
         for x in iter {
             println!("{}", x);
