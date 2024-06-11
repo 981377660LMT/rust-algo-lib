@@ -1,3 +1,7 @@
+use crate::template::*;
+#[allow(unused)]
+use crate::{out, outln, read, veci};
+
 pub struct UnionFind {
     part: usize,
     parent_or_size: Vec<i32>,
@@ -78,6 +82,23 @@ impl UnionFind {
     pub fn part(&self) -> usize {
         self.part
     }
+}
+
+#[allow(unused)]
+// https://judge.yosupo.jp/problem/unionfind
+fn main() {
+    let (n, q) = read!(usize, usize);
+    let mut uf = UnionFind::new(n);
+    for _ in 0..q {
+        let (op, u, v) = read!(u8, usize, usize);
+        if op == 0 {
+            uf.union(u, v, None);
+        } else {
+            outln!("{}", if uf.is_connected(u, v) { 1 } else { 0 });
+        }
+    }
+
+    out_flush();
 }
 
 #[cfg(test)]

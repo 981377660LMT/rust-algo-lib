@@ -201,9 +201,9 @@ pub mod fast_set {
 }
 
 #[allow(unused)]
+// https://judge.yosupo.jp/problem/predecessor_problem
 fn main() {
     use fast_set::FastSet;
-
     let (n, q) = read!(usize, usize);
     let mut set = FastSet::new_with_filled(n, false);
     for i in 0..n {
