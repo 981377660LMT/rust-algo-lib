@@ -14,7 +14,7 @@ mod tests {
 
     #[test]
     fn test_join_str() {
-        let v = vec![1, 2, 3];
+        let v = [1, 2, 3];
         assert_eq!(v.iter().join_str(","), "1,2,3");
     }
 }

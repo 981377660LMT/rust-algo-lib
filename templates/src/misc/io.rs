@@ -11,7 +11,6 @@ pub mod scanner {
                 it: s.split_whitespace(),
             }
         }
-
         pub fn next<T: FromStr>(&mut self) -> T {
             self.it.next().unwrap().parse::<T>().ok().unwrap()
         }

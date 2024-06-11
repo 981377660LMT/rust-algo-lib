@@ -1,0 +1,4 @@
+{
+  "rust-analyzer.runnables.command": "cargo watch",
+  "rust-analyzer.runnables.extraTestBinaryArgs": ["--nocapture", "--color=always"]
+}
