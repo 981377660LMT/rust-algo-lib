@@ -8,7 +8,7 @@ pub use std::{
     },
     convert::{TryFrom, TryInto},
     error::Error,
-    fmt::{Display, Write as FmtWrite},
+    fmt::{Debug, Display, Write as FmtWrite},
     hash::{BuildHasher, Hash, Hasher},
     io::{BufWriter, Read, Stdin, Stdout, Write},
     iter::{FromIterator, Peekable},
@@ -266,7 +266,7 @@ pub trait CommonNumExt {
     fn gcd(self, b: Self) -> Self;
     fn highest_one(self) -> Self;
     fn lowest_one(self) -> Self;
-    fn sig_bits(self) -> u32;
+    fn bit_length(self) -> u32;
 }
 
 macro_rules! impl_common_num_ext {
@@ -291,10 +291,10 @@ macro_rules! impl_common_num_ext {
                     a << shift
                 }
                 #[inline] fn highest_one(self) -> Self {
-                    if self == 0 { 0 } else { const ONE: $ux = 1; ONE << self.sig_bits() - 1 }
+                    if self == 0 { 0 } else { const ONE: $ux = 1; ONE << self.bit_length() - 1 }
                 }
                 #[inline] fn lowest_one(self) -> Self { self & self.wrapping_neg() }
-                #[inline] fn sig_bits(self) -> u32 { std::mem::size_of::<$ux>() as u32 * 8 - self.leading_zeros() }
+                #[inline] fn bit_length(self) -> u32 { std::mem::size_of::<$ux>() as u32 * 8 - self.leading_zeros() }
             }
 
             impl CommonNumExt for $ix {
@@ -312,7 +312,7 @@ macro_rules! impl_common_num_ext {
                 }
                 #[inline] fn highest_one(self) -> Self { (self as $ux).highest_one() as _ }
                 #[inline] fn lowest_one(self) -> Self { self & self.wrapping_neg() }
-                #[inline] fn sig_bits(self) -> u32 { std::mem::size_of::<$ix>() as u32 * 8 - self.leading_zeros() }
+                #[inline] fn bit_length(self) -> u32 { std::mem::size_of::<$ix>() as u32 * 8 - self.leading_zeros() }
             }
         )*
     }
@@ -325,6 +325,10 @@ impl_common_num_ext!(
     i128 = u128,
     isize = usize
 );
+
+// region: number
+
+// endregion
 
 pub trait ChMaxMin<T> {
     fn chmax(&mut self, v: T) -> bool;
@@ -363,6 +367,18 @@ impl<T: PartialOrd> ChMaxMin<T> for T {
             true
         } else {
             false
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test() {
+        for v in 0..=10 {
+            println!("{}: {}", v, v.bit_length());
         }
     }
 }

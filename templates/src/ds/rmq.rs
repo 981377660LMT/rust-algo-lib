@@ -35,18 +35,18 @@ pub mod rmq {
             SparseTable { table, size: n, op }
         }
 
-        pub fn from_fn(n: usize, f: fn(usize) -> T, op: fn(T, T) -> T) -> Self {
-            if n == 0 {
-                return SparseTable {
-                    table: vec![],
-                    size: 0,
-                    op,
-                };
-            }
-            let level = n.sig_bits();
-        }
+        // pub fn from_fn(n: usize, f: fn(usize) -> T, op: fn(T, T) -> T) -> Self {
+        //     if n == 0 {
+        //         return SparseTable {
+        //             table: vec![],
+        //             size: 0,
+        //             op,
+        //         };
+        //     }
+        //     let level = n.sig_bits();
+        // }
 
-        pub fn query(&self, start: usize, end: usize) -> T {}
+        // pub fn query(&self, start: usize, end: usize) -> T {}
     }
 }
 
