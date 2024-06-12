@@ -1,6 +1,4 @@
 use crate::template::*;
-#[allow(unused)]
-use crate::{out, outln, read, veci};
 
 /// reference: https://natsugiri.hatenablog.com/entry/2016/10/10/035445  
 ///

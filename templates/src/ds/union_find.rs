@@ -1,6 +1,4 @@
 use crate::template::*;
-#[allow(unused)]
-use crate::{out, outln, read, veci};
 
 pub struct UnionFind {
     part: usize,

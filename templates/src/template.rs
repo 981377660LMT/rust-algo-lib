@@ -52,26 +52,26 @@ pub fn out_fn<F: FnOnce(&mut Output) -> R, R>(f: F) -> R {
     unsafe { f((*OUTPUT.0.get()).get_or_insert_with(_init_output)) }
 }
 
-#[macro_export]
 macro_rules! read {
     () => { read_fn() };
     ($t: ty) => { read_fn::<$t>() };
     ($t: ty, $($tt: ty),*) => { (read_fn::<$t>(), $(read_fn::<$tt>(),)*) };
     [$t: ty; $n: expr] => { read_vec::<$t>($n) };
 }
+pub(crate) use read;
 
-#[macro_export]
 macro_rules! outln {
     () => { out_fn(|x| { let _ = writeln!(x); }) };
     ($exp: expr) => { out_fn(|x| { let _ = writeln!(x, "{}", $exp); }) };
     ($fmt: expr, $($arg : tt )*) => { out_fn(|x| { let _ = writeln!(x, $fmt, $($arg)*); }) }
 }
+pub(crate) use outln;
 
-#[macro_export]
 macro_rules! out {
     ($exp: expr) => { out_fn(|x| { let _ = write!(x, "{}", $exp); }) };
     ($fmt: expr, $($arg : tt )*) => { out_fn(|x| { let _ = write!(x, $fmt, $($arg)*); }) }
 }
+pub(crate) use out;
 
 pub fn out_flush() {
     out_fn(|x| {
@@ -239,7 +239,6 @@ impl AsStr for [u8] {
     }
 }
 
-#[macro_export]
 macro_rules! veci {
     ($n:expr , $i:ident : $gen:expr) => {{
         let _veci_n = $n;
@@ -251,6 +250,7 @@ macro_rules! veci {
     }};
     ($n:expr , $gen:expr) => { veci!($n, _veci_: $gen) }
 }
+pub(crate) use veci;
 
 pub fn abs_diff<T: Sub<Output = T> + PartialOrd>(x: T, y: T) -> T {
     if x < y {

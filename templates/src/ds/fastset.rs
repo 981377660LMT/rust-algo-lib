@@ -1,6 +1,4 @@
 use crate::template::*;
-#[allow(unused)]
-use crate::{out, outln, read, veci};
 
 pub mod fast_set {
     use std::fmt::Debug;

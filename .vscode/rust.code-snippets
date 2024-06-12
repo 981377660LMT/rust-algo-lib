@@ -4,8 +4,6 @@
     "prefix": ["input", "read", "io"],
     "body": [
       "use crate::template::*;",
-      "#[allow(unused)]",
-      "use crate::{out, outln, read, veci};",
       "",
       "#[allow(unused)]",
       "fn main() {",
@@ -35,17 +33,7 @@
   "test": {
     "scope": "rust",
     "prefix": "test",
-    "body": [
-      "#[cfg(test)]",
-      "mod tests {",
-      "\t\tuse super::*;",
-      "",
-      "\t\t#[test]",
-      "\t\tfn test() {",
-      "\t\t\t\tmain();",
-      "\t\t}",
-      "}"
-    ],
+    "body": ["#[cfg(test)]", "mod tests {", "\t\tuse super::*;", "", "\t\t#[test]", "\t\tfn test() {", "\t\t\t\tmain();", "\t\t}", "}"],
     "description": "test"
   }
 }
