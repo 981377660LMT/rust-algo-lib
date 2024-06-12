@@ -4,7 +4,7 @@ pub trait NumExt {
     fn gcd(self, b: Self) -> Self;
     fn highest_one(self) -> Self;
     fn lowest_one(self) -> Self;
-    fn sig_bits(self) -> u32;
+    fn bit_length(self) -> u32;
 }
 
 macro_rules! impl_num_ext {
@@ -29,10 +29,10 @@ macro_rules! impl_num_ext {
                 a << shift
             }
             #[inline] fn highest_one(self) -> Self {
-                if self == 0 { 0 } else { const ONE: $ux = 1; ONE << self.sig_bits() - 1 }
+                if self == 0 { 0 } else { const ONE: $ux = 1; ONE << self.bit_length() - 1 }
             }
             #[inline] fn lowest_one(self) -> Self { self & self.wrapping_neg() }
-            #[inline] fn sig_bits(self) -> u32 { std::mem::size_of::<$ux>() as u32 * 8 - self.leading_zeros() }
+            #[inline] fn bit_length(self) -> u32 { std::mem::size_of::<$ux>() as u32 * 8 - self.leading_zeros() }
         }
 
         impl NumExt for $ix {
@@ -50,7 +50,7 @@ macro_rules! impl_num_ext {
             }
             #[inline] fn highest_one(self) -> Self { (self as $ux).highest_one() as _ }
             #[inline] fn lowest_one(self) -> Self { self & self.wrapping_neg() }
-            #[inline] fn sig_bits(self) -> u32 { std::mem::size_of::<$ix>() as u32 * 8 - self.leading_zeros() }
+            #[inline] fn bit_length(self) -> u32 { std::mem::size_of::<$ix>() as u32 * 8 - self.leading_zeros() }
         }
     )*
   }

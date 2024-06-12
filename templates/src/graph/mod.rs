@@ -1,3 +1,4 @@
+pub mod bfs;
 pub mod dinic;
 pub mod flow;
 pub mod ford_fulkerson;

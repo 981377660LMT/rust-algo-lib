@@ -1,3 +1,4 @@
+pub mod randtools;
 pub mod dice;
 pub mod io;
 

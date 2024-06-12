@@ -267,6 +267,9 @@ pub trait CommonNumExt {
     fn highest_one(self) -> Self;
     fn lowest_one(self) -> Self;
     fn bit_length(self) -> u32;
+    fn bit_count(self) -> u32;
+    fn log2_floor(self) -> u32;
+    fn log2_ceil(self) -> u32;
 }
 
 macro_rules! impl_common_num_ext {
@@ -295,6 +298,9 @@ macro_rules! impl_common_num_ext {
                 }
                 #[inline] fn lowest_one(self) -> Self { self & self.wrapping_neg() }
                 #[inline] fn bit_length(self) -> u32 { std::mem::size_of::<$ux>() as u32 * 8 - self.leading_zeros() }
+                #[inline] fn bit_count(self) -> u32 { self.count_ones() }
+                #[inline] fn log2_floor(self) -> u32 { std::mem::size_of::<$ux>() as u32 * 8 - self.leading_zeros() - 1 }
+                #[inline] fn log2_ceil(self) -> u32 { std::mem::size_of::<$ux>() as u32 * 8 - self.leading_zeros() - 1 + (self & (self - 1) != 0) as u32 }
             }
 
             impl CommonNumExt for $ix {
@@ -313,6 +319,9 @@ macro_rules! impl_common_num_ext {
                 #[inline] fn highest_one(self) -> Self { (self as $ux).highest_one() as _ }
                 #[inline] fn lowest_one(self) -> Self { self & self.wrapping_neg() }
                 #[inline] fn bit_length(self) -> u32 { std::mem::size_of::<$ix>() as u32 * 8 - self.leading_zeros() }
+                #[inline] fn bit_count(self) -> u32 { self.count_ones() }
+                #[inline] fn log2_floor(self) -> u32 { std::mem::size_of::<$ix>() as u32 * 8 - self.leading_zeros() - 1 }
+                #[inline] fn log2_ceil(self) -> u32 { std::mem::size_of::<$ix>() as u32 * 8 - self.leading_zeros() - 1 + (self & (self - 1) != 0) as u32 }
             }
         )*
     }
@@ -325,10 +334,6 @@ impl_common_num_ext!(
     i128 = u128,
     isize = usize
 );
-
-// region: number
-
-// endregion
 
 pub trait ChMaxMin<T> {
     fn chmax(&mut self, v: T) -> bool;
@@ -371,14 +376,50 @@ impl<T: PartialOrd> ChMaxMin<T> for T {
     }
 }
 
+pub fn reduce_mut<T>(a: &mut [T], mut f: impl FnMut(&mut T, &mut T)) {
+    if !a.is_empty() {
+        for i in 1..a.len() {
+            let (left, right) = a.split_at_mut(i);
+            f(left.last_mut().unwrap(), right.first_mut().unwrap());
+        }
+    }
+}
+
+pub fn reduce_right_mut<T>(a: &mut [T], mut f: impl FnMut(&mut T, &mut T)) {
+    if !a.is_empty() {
+        for i in (1..a.len()).rev() {
+            let (left, right) = a.split_at_mut(i);
+            f(right.first_mut().unwrap(), left.last_mut().unwrap());
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test() {
-        for v in 0..=10 {
-            println!("{}: {}", v, v.bit_length());
+        for v in 1..=10 {
+            println!(
+                "{}: {}:{}:{}",
+                v,
+                v.bit_length(),
+                v.log2_floor(),
+                v.log2_ceil()
+            );
         }
+    }
+
+    #[test]
+    fn test_reduce_mut() {
+        let mut a = vec![1, 2, 3, 4, 5];
+        reduce_mut(&mut a, |&mut pre, cur| *cur += pre);
+        assert_eq!(a, vec![1, 3, 6, 10, 15]);
+
+        let mut a = vec![1, 2, 3, 4, 5];
+        reduce_right_mut(&mut a, |&mut pre, cur| *cur += pre);
+        println!("{:?}", a);
+        assert_eq!(a, vec![15, 14, 12, 9, 5]);
     }
 }

@@ -68,7 +68,7 @@ pub mod fast_set {
             if n == 0 {
                 Self::default()
             } else {
-                let mut bs = Vec::with_capacity(max(1, (n - 1).sig_bits().div_ceil(6) as usize));
+                let mut bs = Vec::with_capacity(max(1, (n - 1).bit_length().div_ceil(6) as usize));
                 let mut m = n;
                 loop {
                     bs.push(SimpleBitSet::new_with_filled(m, filled));
