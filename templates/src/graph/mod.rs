@@ -1,3 +1,4 @@
+pub mod tree_diameter;
 pub mod bfs;
 pub mod dinic;
 pub mod flow;
